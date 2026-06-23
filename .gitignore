@@ -1,0 +1,19 @@
+# Binarios compilados
+mochila_pd
+mochila_bt
+mochila_bb
+
+# Artefatos de build
+*.o
+*.obj
+*.out
+*.exe
+
+# Instancias geradas e resultados dos experimentos
+instancias/
+resultados/
+*.csv
+
+# Diversos
+.DS_Store
+*~
