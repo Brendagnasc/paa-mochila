@@ -22,3 +22,6 @@ instancias/
 # Cache do Python
 __pycache__/
 *.pyc
+
+# Configuracoes do editor
+.vscode/
