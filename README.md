@@ -24,9 +24,6 @@ Pipeline experimental (Python 3):
 - `gerar_graficos.py` - graficos de tempo x n e tempo x capacidade
 - `teste_random.py` - teste de corretude (compara os tres algoritmos)
 
-Relatorio:
-- `build_relatorio.js` - gera `relatorio_mochila.docx` (Node.js)
-
 ## Implementacoes
 
 | Arquivo | Estrategia | Tempo (pior caso) | Espaco |
@@ -103,15 +100,6 @@ python3 gerar_graficos.py
 As combinacoes de `n`, `W` e `V` ficam no topo do `rodar_experimentos.py`. Se voce
 alterar a grade, ajuste tambem as constantes `FATOR_CAP` e `N_FIXO` no
 `gerar_graficos.py` para os graficos continuarem coerentes.
-
-## Relatorio
-
-```bash
-node build_relatorio.js
-```
-
-Gera `relatorio_mochila.docx`, ja com a estrutura preenchida e os graficos
-embutidos a partir de `resultados/`. Rode os graficos antes.
 
 ## Teste de corretude
 
