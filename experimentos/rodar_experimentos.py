@@ -22,8 +22,12 @@ import re
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 from gerar_instancias import gerar_para_combinacao
+
+RAIZ = Path(__file__).resolve().parent.parent
+BIN = RAIZ / "algoritmos"
 
 # ---------------------------------------------------------------------------
 # Configuracao dos experimentos (ajuste a vontade)
@@ -31,14 +35,14 @@ from gerar_instancias import gerar_para_combinacao
 QTD_INSTANCIAS = 10        # instancias por combinacao (o enunciado pede 10)
 SEED_BASE = 12345          # semente base para reprodutibilidade
 TIMEOUT_S = 60             # limite de tempo por execucao (segundos)
-PASTA_INST = "instancias"
-PASTA_RES = "resultados"
+PASTA_INST = str(RAIZ / "instancias")
+PASTA_RES = str(RAIZ / "resultados")
 ARQUIVO_CSV = os.path.join(PASTA_RES, "tempos.csv")
 
 ALGORITMOS = [
-    ("pd", "./mochila_pd"),
-    ("bt", "./mochila_bt"),
-    ("bb", "./mochila_bb"),
+    ("pd", str(BIN / "mochila_pd")),
+    ("bt", str(BIN / "mochila_bt")),
+    ("bb", str(BIN / "mochila_bb")),
 ]
 
 # Varredura 1 - EFEITO DE n: capacidade cresce com n (regime dificil, ~metade
@@ -71,7 +75,7 @@ RE_TEMPO = re.compile(r"Tempo de execucao:\s*([0-9.eE+-]+)")
 
 def compilar():
     print("Compilando (make)...")
-    r = subprocess.run(["make"], capture_output=True, text=True)
+    r = subprocess.run(["make"], cwd=str(RAIZ), capture_output=True, text=True)
     if r.returncode != 0:
         print("Falha ao compilar. Saida do make:\n" + r.stderr)
         sys.exit(1)

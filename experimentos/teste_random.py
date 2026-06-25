@@ -22,6 +22,10 @@ import random
 import re
 import subprocess
 import time
+from pathlib import Path
+
+RAIZ = Path(__file__).resolve().parent.parent
+BIN = RAIZ / "algoritmos"
 
 RE_LUCRO = re.compile(r"Lucro maximo:\s*(\d+)")
 RE_TEMPO = re.compile(r"Tempo de execucao:\s*([0-9.eE+-]+)")
@@ -141,12 +145,12 @@ def main():
     ap.add_argument("--seed", type=int, default=42, help="semente (padrao 42)")
     args = ap.parse_args()
 
-    algos = [("PD", "./mochila_pd")]
+    algos = [("PD", str(BIN / "mochila_pd"))]
     if not args.sem_bt:
-        algos.append(("BT", "./mochila_bt"))
-    algos.append(("BB", "./mochila_bb"))
+        algos.append(("BT", str(BIN / "mochila_bt")))
+    algos.append(("BB", str(BIN / "mochila_bb")))
     if args.com_pd_grande:
-        algos.append(("PDG", "./mochila_pd_grande"))
+        algos.append(("PDG", str(BIN / "mochila_pd_grande")))
 
     if not args.sem_bt and args.n_max > 20:
         print(f"[aviso] n-max={args.n_max} com backtracking pode ser MUITO lento, "

@@ -14,18 +14,21 @@
 import csv
 import os
 from collections import defaultdict
+from pathlib import Path
 from statistics import mean, pstdev
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+RAIZ = Path(__file__).resolve().parent.parent
+
 # Devem casar com a configuracao do rodar_experimentos.py
 FATOR_CAP = 3     # no efeito de n, capacidade = FATOR_CAP * n
 N_FIXO = 20       # no efeito da capacidade, n fixo
 
-ARQUIVO_CSV = os.path.join("resultados", "tempos.csv")
-PASTA_RES = "resultados"
+ARQUIVO_CSV = str(RAIZ / "resultados" / "tempos.csv")
+PASTA_RES = str(RAIZ / "resultados")
 ALGS = ["pd", "bt", "bb"]
 NOME = {"pd": "Programacao dinamica", "bt": "Backtracking", "bb": "Branch-and-bound"}
 ESTILO = {"pd": ("o", "#1f77b4"), "bt": ("s", "#d62728"), "bb": ("^", "#2ca02c")}

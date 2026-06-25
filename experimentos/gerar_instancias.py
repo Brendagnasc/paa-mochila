@@ -12,6 +12,9 @@
 
 import os
 import random
+from pathlib import Path
+
+RAIZ = Path(__file__).resolve().parent.parent
 
 # Faixas dos atributos dos itens (fixas em todos os experimentos).
 PESO_MAX = 10
@@ -57,7 +60,7 @@ if __name__ == "__main__":
     ap.add_argument("-W", type=int, required=True, help="capacidade de peso")
     ap.add_argument("-V", type=int, required=True, help="capacidade de volume")
     ap.add_argument("--qtd", type=int, default=10, help="quantidade de instancias (padrao 10)")
-    ap.add_argument("--pasta", default="instancias", help="pasta de saida")
+    ap.add_argument("--pasta", default=str(RAIZ / "instancias"), help="pasta de saida")
     ap.add_argument("--seed", type=int, default=12345, help="semente base")
     args = ap.parse_args()
 

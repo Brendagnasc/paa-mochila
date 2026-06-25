@@ -1,7 +1,8 @@
-# Binarios compilados
-mochila_pd
-mochila_bt
-mochila_bb
+# Binarios compilados (em algoritmos/)
+algoritmos/mochila_pd
+algoritmos/mochila_bt
+algoritmos/mochila_bb
+algoritmos/mochila_pd_grande
 
 # Artefatos de build
 *.o
@@ -9,11 +10,15 @@ mochila_bb
 *.out
 *.exe
 
-# Instancias geradas e resultados dos experimentos
-instancias/
+# Saidas geradas
 resultados/
+instancias/
 *.csv
 
 # Diversos
 .DS_Store
 *~
+
+# Cache do Python
+__pycache__/
+*.pyc

@@ -22,12 +22,14 @@ import csv
 import os
 from collections import defaultdict
 from itertools import combinations
+from pathlib import Path
 
 from scipy.stats import friedmanchisquare, wilcoxon
 
+RAIZ = Path(__file__).resolve().parent.parent
 ALPHA = 0.05
-ARQUIVO_CSV = os.path.join("resultados", "tempos.csv")
-ARQUIVO_SAIDA = os.path.join("resultados", "estatistica.csv")
+ARQUIVO_CSV = str(RAIZ / "resultados" / "tempos.csv")
+ARQUIVO_SAIDA = str(RAIZ / "resultados" / "estatistica.csv")
 ALGS = ["pd", "bt", "bb"]
 NOME = {"pd": "PD", "bt": "BT", "bb": "BB"}
 
