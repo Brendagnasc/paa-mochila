@@ -21,6 +21,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 
 from gerar_instancias import gerar_para_combinacao
 
@@ -93,28 +94,76 @@ def rodar(prog, arquivo):
     return lucro, tempo, "ok"
 
 
+def fmt(segundos):
+    """Formata uma duracao de forma legivel."""
+    if segundos < 90:
+        return f"{segundos:.1f}s"
+    minutos = segundos / 60
+    if minutos < 90:
+        return f"{minutos:.1f} min"
+    return f"{minutos / 60:.2f} h"
+
+
+def estimar(combos, qtd):
+    """Roda 1 instancia por combinacao e projeta o tempo total para 'qtd'
+    instancias. Custa cerca de 1/qtd da rodada completa."""
+    print(f"\nPrevia de tempo: 1 instancia por combinacao, projetando para {qtd} "
+          f"instancias.\n")
+    total = 0.0
+    incerto = False
+    for (n, W, V) in combos:
+        arq = gerar_para_combinacao(n, W, V, 1, PASTA_INST, SEED_BASE)[0]
+        sub = 0.0
+        marca = ""
+        for nome, prog in ALGORITMOS:
+            t0 = time.perf_counter()
+            _, _, status = rodar(prog, arq)
+            sub += time.perf_counter() - t0
+            if status == "timeout":
+                marca = f"  (timeout em {nome.upper()}; estimativa e um piso)"
+                incerto = True
+        proj = sub * qtd
+        total += proj
+        print(f"n={n:>4} W={W:>4} V={V:>4} | 1 inst: {fmt(sub):>9} "
+              f"-> {qtd} inst: {fmt(proj):>9}{marca}")
+    print(f"\nEstimativa do tempo TOTAL da rodada completa: ~{fmt(total)}")
+    if incerto:
+        print("Alguns combos bateram no timeout, entao o tempo real pode ser maior.")
+    print("Obs.: estimativa aproximada; BT e BB variam bastante entre instancias.")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--rapido", action="store_true", help="grade pequena para validar o pipeline")
+    ap.add_argument("--estimar", action="store_true",
+                    help="mostra a estimativa (1 instancia por combinacao) antes de rodar tudo")
+    ap.add_argument("-i", "--instancias", type=int, default=None,
+                    help="instancias por combinacao (padrao 10, ou 3 com --rapido)")
     args = ap.parse_args()
 
     compilar()
 
     if args.rapido:
         combos = grade_rapida()
-        qtd = 3
+        qtd = args.instancias if args.instancias is not None else 3
     else:
         combos = grade_efeito_n() + grade_efeito_capacidade()
         # remove combinacoes repetidas preservando a ordem
         vistos = set()
         combos = [c for c in combos if not (c in vistos or vistos.add(c))]
-        qtd = QTD_INSTANCIAS
+        qtd = args.instancias if args.instancias is not None else QTD_INSTANCIAS
+
+    if args.estimar:
+        estimar(combos, qtd)
 
     os.makedirs(PASTA_RES, exist_ok=True)
     linhas_csv = []
-    print(f"\n{len(combos)} combinacoes, {qtd} instancias cada.\n")
+    total_combos = len(combos)
+    print(f"\n{total_combos} combinacoes, {qtd} instancias cada.\n")
+    inicio = time.perf_counter()
 
-    for (n, W, V) in combos:
+    for ci, (n, W, V) in enumerate(combos, start=1):
+        t_combo = time.perf_counter()
         arquivos = gerar_para_combinacao(n, W, V, qtd, PASTA_INST, SEED_BASE)
         # acumula tempos por algoritmo para o resumo
         tempos = {nome: [] for nome, _ in ALGORITMOS}
@@ -138,10 +187,13 @@ def main():
 
         def media(xs):
             return sum(xs) / len(xs) if xs else float("nan")
-        print(f"n={n:>3} W={W:>3} V={V:>3} | "
+        dt_combo = time.perf_counter() - t_combo
+        elapsed = time.perf_counter() - inicio
+        print(f"[{ci}/{total_combos}] n={n:>3} W={W:>3} V={V:>3} | "
               f"PD={media(tempos['pd']):.6f}s  "
               f"BT={media(tempos['bt']):.6f}s  "
-              f"BB={media(tempos['bb']):.6f}s")
+              f"BB={media(tempos['bb']):.6f}s  "
+              f"| combo: {fmt(dt_combo)}  acumulado: {fmt(elapsed)}")
 
     with open(ARQUIVO_CSV, "w", newline="") as f:
         campos = ["n", "W", "V", "instancia", "algoritmo", "lucro", "tempo_s", "status"]
@@ -150,6 +202,7 @@ def main():
         w.writerows(linhas_csv)
 
     print(f"\nResultados salvos em '{ARQUIVO_CSV}' ({len(linhas_csv)} linhas).")
+    print(f"Tempo total da rodada: {fmt(time.perf_counter() - inicio)}.")
 
 
 if __name__ == "__main__":
